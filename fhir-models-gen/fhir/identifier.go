@@ -25,6 +25,6 @@ type Identifier struct {
 	Type      *CodeableConcept `bson:"type,omitempty" json:"type,omitempty"`
 	System    *string          `bson:"system,omitempty" json:"system,omitempty"`
 	Value     *string          `bson:"value,omitempty" json:"value,omitempty"`
-	Period    *Period          `bson:"period,omitempty" json:"period,omitempty"`
-	Assigner  *Reference       `bson:"assigner,omitempty" json:"assigner,omitempty"`
+	Period    *fhir.Period     `bson:"period,omitempty" json:"period,omitempty"`
+	Assigner  *fhir.Reference  `bson:"assigner,omitempty" json:"assigner,omitempty"`
 }

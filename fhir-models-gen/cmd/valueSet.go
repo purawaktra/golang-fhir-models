@@ -48,7 +48,7 @@ func generateValueSet(resources ResourceMap, valueSet fhir.ValueSet) (*jen.File,
 	// type
 	file.Commentf("%s is documented here %s", *valueSet.Name, *valueSet.Url)
 	file.Type().Id(*valueSet.Name).Int()
-	file.Const().DefsFunc(constsRoot(*valueSet.Name, codeSystem.Concept))
+	file.Const().DefsFunc(constRoot(*valueSet.Name, codeSystem.Concept))
 
 	// MarshalJSON function
 	file.Func().
@@ -128,7 +128,7 @@ func canonical(include fhir.ValueSetComposeInclude) string {
 	return ""
 }
 
-func constsRoot(valueSetName string, concepts []fhir.CodeSystemConcept) func(*jen.Group) {
+func constRoot(valueSetName string, concepts []fhir.CodeSystemConcept) func(*jen.Group) {
 	return func(group *jen.Group) {
 		group.Id(codeIdentifier(valueSetName, concepts[0].Code)).Id(valueSetName).Op("=").Iota()
 		if len(concepts[0].Concept) > 0 {

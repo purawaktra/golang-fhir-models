@@ -17,6 +17,8 @@ package cmd
 import (
 	"encoding/json"
 	"fmt"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -286,7 +288,7 @@ func generateResourceOrType(resources ResourceMap, requiredTypes map[string]bool
 
 	// generate unmarshal
 	if definition.Kind == fhir.StructureDefinitionKindResource {
-		file.Commentf("Unmarshal%s unmarshals a %s.", definition.Name, definition.Name)
+		file.Commentf("Unmarshal%s unmarshal a %s.", definition.Name, definition.Name)
 		file.Func().Id("Unmarshal"+definition.Name).
 			Params(jen.Id("b").Op("[]").Byte()).
 			Params(jen.Id(definition.Name), jen.Error()).
@@ -321,13 +323,14 @@ func appendGeneratorComment(file *jen.File) {
 func appendFields(resources ResourceMap, requiredTypes map[string]bool, requiredValueSetBindings map[string]bool,
 	file *jen.File, fields *jen.Group, parentName string, elementDefinitions []fhir.ElementDefinition, start,
 	level int) (int, error) {
+	title := cases.Title(language.English)
 	//fmt.Printf("appendFields parentName=%s, start=%d, level=%d\n", parentName, start, level)
 	for i := start; i < len(elementDefinitions); i++ {
 		element := elementDefinitions[i]
 		pathParts := Split(element.Path, ".")
 		if len(pathParts) == level+1 {
-			// direct childs
-			name := Title(pathParts[level])
+			// direct children
+			name := title.String(pathParts[level])
 
 			// support contained resources later
 			if name != "Contained" {
@@ -343,8 +346,10 @@ func appendFields(resources ResourceMap, requiredTypes map[string]bool, required
 						}
 
 						typeIdentifier := ""
+
 						for _, pathPart := range Split((*element.ContentReference)[1:], ".") {
-							typeIdentifier = typeIdentifier + Title(pathPart)
+
+							typeIdentifier = typeIdentifier + title.String(pathPart)
 						}
 						statement.Id(typeIdentifier).Tag(map[string]string{"json": pathParts[level] + ",omitempty", "bson": pathParts[level] + ",omitempty"})
 					}
@@ -359,7 +364,7 @@ func appendFields(resources ResourceMap, requiredTypes map[string]bool, required
 				default: //polymorphic type
 					name = Replace(pathParts[level], "[x]", "", -1)
 					for _, eleType := range element.Type {
-						name := name + Title(eleType.Code)
+						name := name + title.String(eleType.Code)
 
 						var err error
 						i, err = addFieldStatement(resources, requiredTypes, requiredValueSetBindings, file, fields,
@@ -391,7 +396,8 @@ func addFieldStatement(
 	elementIndex, level int,
 	elementType fhir.ElementDefinitionType,
 ) (idx int, err error) {
-	fieldName := Title(name)
+	title := cases.Title(language.English)
+	fieldName := title.String(name)
 	element := elementDefinitions[elementIndex]
 	statement := fields.Id(fieldName)
 

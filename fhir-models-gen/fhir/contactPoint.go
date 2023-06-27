@@ -25,5 +25,5 @@ type ContactPoint struct {
 	Value     *string             `bson:"value,omitempty" json:"value,omitempty"`
 	Use       *ContactPointUse    `bson:"use,omitempty" json:"use,omitempty"`
 	Rank      *int                `bson:"rank,omitempty" json:"rank,omitempty"`
-	Period    *Period             `bson:"period,omitempty" json:"period,omitempty"`
+	Period    *fhir.Period        `bson:"period,omitempty" json:"period,omitempty"`
 }
